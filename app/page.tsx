@@ -1,72 +1,53 @@
 "use client";
 import { useState, useEffect } from "react";
-type Tx = { id: number; name: string; amount: number; method: string; type: 'income'|'expense'; date: string; };
+type Tx = { id:number; name:string; amount:number; method:string; type:'income'|'expense'; date:string; };
 
-export default function Page() {
-  const [balance, setBalance] = useState(0);
-  const [list, setList] = useState<Tx[]>([]);
-  const [name, setName] = useState(""); const [amount, setAmount] = useState("");
-  const [method, setMethod] = useState("bkash"); const [type, setType] = useState<'income'|'expense'>('income');
-  
+export default function Page(){
+  const [balance,setBalance]=useState(0);
+  const [list,setList]=useState<Tx[]>([]);
+  const [name,setName]=useState(""); const [amount,setAmount]=useState("");
+  const [method,setMethod]=useState("bkash"); const [type,setType]=useState<'income'|'expense'>('income');
   useEffect(()=>{ const b=localStorage.getItem("mirgonj_balance"); const l=localStorage.getItem("mirgonj_customers"); if(b)setBalance(Number(b)); if(l)setList(JSON.parse(l)); },[]);
   useEffect(()=>{ localStorage.setItem("mirgonj_balance",String(balance)); localStorage.setItem("mirgonj_customers",JSON.stringify(list)); },[balance,list]);
-
-  const add=()=>{
-    if(!name||!amount)return alert("নাম ও টাকা দিন"); const a=Number(amount);
-    const tx:Tx={id:Date.now(),name,amount:a,method,type,date:new Date().toLocaleTimeString('bn-BD',{hour:'2-digit',minute:'2-digit'})};
-    setList([tx,...list]); setBalance(type==='income'?balance+a:balance-a); setName(""); setAmount("");
-  };
-  const del=(id:number,a:number,t:string)=>{ if(!confirm("Delete?"))return; setList(list.filter(x=>x.id!==id)); setBalance(t==='income'?balance-a:balance+a); };
-
+  const add=()=>{ if(!name||!amount)return alert("নাম ও টাকা দিন"); const a=Number(amount); setList([{id:Date.now(),name,amount:a,method,type,date:new Date().toLocaleTimeString('bn-BD')},...list]); setBalance(type==='income'?balance+a:balance-a); setName(""); setAmount(""); };
   const sum=(m:string)=> list.filter(x=>x.method===m&&x.type==='income').reduce((s,x)=>s+x.amount,0)-list.filter(x=>x.method===m&&x.type==='expense').reduce((s,x)=>s+x.amount,0);
 
-  return (
-    <div style={{minHeight:'100vh',background:'#050507',color:'white',padding:'16px',fontFamily:'system-ui'}}>
-      <div style={{maxWidth:'420px',margin:'0 auto'}}>
-        
-        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'20px'}}>
-          <div><h1 style={{fontSize:'26px',fontWeight:'900',margin:0}}>মিরগঞ্জ <span style={{background:'#7c3aed',padding:'2px 8px',borderRadius:'8px',fontSize:'14px',verticalAlign:'middle'}}>PRO</span></h1><p style={{margin:0,opacity:0.6,fontSize:'14px'}}>Wallet PRO</p></div>
-          <div style={{width:'40px',height:'40px',borderRadius:'50%',background:'#222',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'20px'}}>👤</div>
-        </div>
+  return(
+    <div style={{minHeight:'100vh',background:'#020208',color:'white',padding:'16px',fontFamily:'system-ui'}}>
+      <style>{`@keyframes float{0%,100%{transform:perspective(1200px) rotateX(15deg) rotateY(-18deg) translateZ(0)}50%{transform:perspective(1200px) rotateX(20deg) rotateY(-20deg) translateZ(25px)}}`}</style>
+      <div style={{maxWidth:'420px',margin:'0 auto',position:'relative'}}>
+        <div style={{position:'absolute',top:'80px',left:'-50px',width:'200px',height:'200px',background:'#a855f7',filter:'blur(80px)',opacity:0.6,borderRadius:'50%'}}></div>
+        <div style={{position:'absolute',top:'200px',right:'-60px',width:'220px',height:'220px',background:'#06b6d4',filter:'blur(90px)',opacity:0.5,borderRadius:'50%'}}></div>
 
-        <div style={{background:'linear-gradient(135deg,#6d28d9 0%,#4f46e5 50%,#3b82f6 100%)',borderRadius:'28px',padding:'22px',position:'relative',overflow:'hidden',boxShadow:'0 20px 40px rgba(124,58,237,0.3)',marginBottom:'18px'}}>
-          <div style={{position:'absolute',top:'-40px',right:'-40px',width:'150px',height:'150px',background:'rgba(255,255,255,0.15)',borderRadius:'50%',filter:'blur(20px)'}}></div>
-          <p style={{opacity:0.9,fontSize:'15px',margin:0}}>মোট ব্যালেন্স 👁️</p>
-          <h2 style={{fontSize:'42px',fontWeight:'900',margin:'8px 0',letterSpacing:'-1px'}}>৳ {balance.toLocaleString('en-IN')}</h2>
-          <p style={{fontSize:'13px',color:'#86efac',margin:'0 0 18px 0'}}>+ ৳ {Math.floor(balance*0.05)} আজ</p>
-          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:'0',borderTop:'1px solid rgba(255,255,255,0.15)',paddingTop:'16px'}}>
-            <div style={{textAlign:'center',borderRight:'1px solid rgba(255,255,255,0.15)'}}><div style={{fontSize:'16px'}}>🅺 bKash</div><b style={{fontSize:'15px'}}>৳ {sum('bkash')}</b></div>
-            <div style={{textAlign:'center',borderRight:'1px solid rgba(255,255,255,0.15)'}}><div style={{fontSize:'16px'}}>🔶 Nagad</div><b style={{fontSize:'15px'}}>৳ {sum('nagad')}</b></div>
-            <div style={{textAlign:'center'}}><div style={{fontSize:'16px'}}>💵 Cash</div><b style={{fontSize:'15px'}}>৳ {sum('cash')}</b></div>
-          </div>
-        </div>
+        <div style={{textAlign:'center',margin:'10px 0 30px'}}><h1 style={{fontSize:'24px',fontWeight:'900',textShadow:'0 0 30px #a855f7'}}>মিরগঞ্জ Wallet • 3D GLASS</h1></div>
 
-        <div style={{background:'#15151a',borderRadius:'22px',padding:'16px',border:'1px solid #23232a',marginBottom:'20px'}}>
-          <input value={name} onChange={e=>setName(e.target.value)} placeholder="কাস্টমার নাম বা প্রাপকের নম্বর..." style={{width:'100%',padding:'14px',borderRadius:'14px',background:'#1e1e25',border:'1px solid #2a2a35',color:'white',marginBottom:'10px',boxSizing:'border-box',outline:'none'}}/>
-          <input value={amount} onChange={e=>setAmount(e.target.value)} type="number" placeholder="৳ পরিমাণ লিখুন" style={{width:'100%',padding:'14px',borderRadius:'14px',background:'#1e1e25',border:'1px solid #2a2a35',color:'white',marginBottom:'12px',boxSizing:'border-box',outline:'none'}}/>
-          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'10px',marginBottom:'10px'}}>
-            <button onClick={()=>setType('income')} style={{padding:'13px',borderRadius:'14px',border:'none',fontWeight:'bold',background:type==='income'?'#16a34a':'#1e1e25',color:'white'}}>⬇️ রিসিভ</button>
-            <button onClick={()=>setType('expense')} style={{padding:'13px',borderRadius:'14px',border:'none',fontWeight:'bold',background:type==='expense'?'#dc2626':'#1e1e25',color:'white'}}>⬆️ পাঠান</button>
-          </div>
-          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:'8px',marginBottom:'12px'}}>
-            {['bkash','nagad','cash'].map(m=>(
-              <button key={m} onClick={()=>setMethod(m)} style={{padding:'11px',borderRadius:'12px',border:'1px solid',borderColor:method===m?'#7c3aed':'#2a2a35',background:method===m?'#7c3aed':'#1e1e25',color:'white',fontWeight:'600',textTransform:'capitalize'}}>{m}</button>
-            ))}
-          </div>
-          <button onClick={add} style={{width:'100%',padding:'14px',borderRadius:'14px',border:'none',background:'white',color:'black',fontWeight:'900',fontSize:'16px'}}>Add করুন ✨</button>
-        </div>
+        <div style={{position:'relative',height:'230px',marginBottom:'20px'}}>
+          <div style={{position:'absolute',top:'20px',left:'20px',right:'20px',height:'150px',borderRadius:'20px',background:'rgba(168,85,247,0.12)',border:'1px solid rgba(168,85,247,0.3)',filter:'blur(0.5px)',transform:'perspective(1000px) rotateX(25deg) rotateY(-15deg)'}}></div>
+          
+          <div style={{position:'relative',borderRadius:'26px',padding:'24px',background:'linear-gradient(145deg, rgba(255,255,255,0.28) 0%, rgba(255,255,255,0.08) 45%, rgba(255,255,255,0.02) 100%)',backdropFilter:'blur(35px) saturate(200%)',border:'2.5px solid rgba(255,255,255,0.4)',borderTop:'3px solid rgba(255,255,255,0.7)',borderLeft:'2px solid rgba(255,255,255,0.5)',boxShadow:'0 0 0 1px rgba(255,255,255,0.2) inset, 0 30px 90px rgba(0,0,0,0.7), 0 0 60px rgba(6,182,214,0.9), 0 0 100px rgba(168,85,247,0.6), inset 0 2px 3px rgba(255,255,255,0.9), inset 0 -1px 2px rgba(0,0,0,0.3)',transform:'perspective(1200px) rotateX(15deg) rotateY(-18deg)',animation:'float 4s ease-in-out infinite'}}>
+            <div style={{position:'absolute',inset:'-3px',borderRadius:'26px',background:'linear-gradient(90deg, #22d3ee, #06b6d4, #22d3ee)',opacity:0.8,filter:'blur(14px)',zIndex:-1}}></div>
+            <div style={{position:'absolute',inset:'0',borderRadius:'26px',border:'2px solid #22d3ee',boxShadow:'0 0 20px #22d3ee, inset 0 0 20px rgba(34,211,238,0.2)',pointerEvents:'none'}}></div>
 
-        <h3 style={{fontSize:'18px',fontWeight:'800',marginBottom:'10px'}}>সাম্প্রতিক লেনদেন</h3>
-        {list.map(c=>(
-          <div key={c.id} style={{background:'#15151a',padding:'14px',borderRadius:'16px',display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'10px',border:'1px solid #23232a'}}>
-            <div style={{display:'flex',gap:'10px',alignItems:'center'}}>
-              <div style={{width:'42px',height:'42px',borderRadius:'12px',background:c.method==='bkash'?'#e11d48':c.method==='nagad'?'#f97316':'#334155',display:'flex',alignItems:'center',justifyContent:'center',fontWeight:'bold'}}>{c.method[0].toUpperCase()}</div>
-              <div><div style={{fontWeight:'bold'}}>{c.name}</div><div style={{fontSize:'12px',opacity:0.5}}>আজ, {c.date} • {c.method}</div></div>
+            <div style={{display:'flex',justifyContent:'space-between'}}><div style={{fontSize:'12px',letterSpacing:'4px',opacity:0.9,fontWeight:'900'}}>MAIN WALLET</div><div style={{fontSize:'10px',border:'1px solid #22d3ee',padding:'3px 10px',borderRadius:'20px',color:'#22d3ee',boxShadow:'0 0 15px #22d3ee',background:'rgba(34,211,238,0.15)'}}>● ACTIVE</div></div>
+            <p style={{margin:'16px 0 0',fontSize:'10px',letterSpacing:'3px',opacity:0.7}}>BALANCE</p>
+            <h2 style={{fontSize:'46px',fontWeight:'900',margin:'6px 0',color:'#a5f3fc',textShadow:'0 0 15px #22d3ee, 0 0 40px #06b6d4, 0 0 80px #06b6d4'}}>৳ {balance.toLocaleString()}</h2>
+            <div style={{display:'flex',gap:'8px',marginTop:'12px',borderTop:'1px solid rgba(255,255,255,0.15)',paddingTop:'14px'}}>
+              <div style={{flex:1,textAlign:'center'}}><div style={{fontSize:'10px',opacity:0.5}}>bKash</div><b style={{color:'#f0abfc',textShadow:'0 0 10px #f0abfc'}}>৳{sum('bkash')}</b></div>
+              <div style={{flex:1,textAlign:'center',borderLeft:'1px solid rgba(255,255,255,0.1)',borderRight:'1px solid rgba(255,255,255,0.1)'}}><div style={{fontSize:'10px',opacity:0.5}}>Nagad</div><b style={{color:'#fdba74',textShadow:'0 0 10px #fb923c'}}>৳{sum('nagad')}</b></div>
+              <div style={{flex:1,textAlign:'center'}}><div style={{fontSize:'10px',opacity:0.5}}>Cash</div><b style={{color:'#7dd3fc',textShadow:'0 0 10px #22d3ee'}}>৳{sum('cash')}</b></div>
             </div>
-            <div style={{textAlign:'right'}}><b style={{color:c.type==='income'?'#4ade80':'#fb7185'}}>{c.type==='income'?'+':'-'} ৳{c.amount}</b><div><button onClick={()=>del(c.id,c.amount,c.type)} style={{background:'none',border:'none',color:'#666',fontSize:'12px'}}>Delete</button></div></div>
           </div>
-        ))}
-        {list.length===0&&<p style={{textAlign:'center',opacity:0.4,padding:'30px'}}>কোন হিসাব নেই</p>}
+        </div>
+
+        <div style={{borderRadius:'20px',padding:'14px',background:'rgba(255,255,255,0.07)',backdropFilter:'blur(25px)',border:'1px solid rgba(255,255,255,0.15)'}}>
+          <input value={name} onChange={e=>setName(e.target.value)} placeholder="কাস্টমার নাম" style={{width:'100%',padding:'12px',borderRadius:'12px',background:'rgba(0,0,0,0.6)',border:'1px solid rgba(255,255,255,0.15)',color:'white',marginBottom:'8px',boxSizing:'border-box',outline:'none'}}/>
+          <input value={amount} onChange={e=>setAmount(e.target.value)} type="number" placeholder="৳ পরিমাণ" style={{width:'100%',padding:'12px',borderRadius:'12px',background:'rgba(0,0,0,0.6)',border:'1px solid rgba(255,255,255,0.15)',color:'white',marginBottom:'10px',boxSizing:'border-box',outline:'none'}}/>
+          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'8px',marginBottom:'8px'}}>
+            <button onClick={()=>setType('income')} style={{padding:'11px',borderRadius:'11px',border:'1px solid',borderColor:type==='income'?'#22c55e':'rgba(255,255,255,0.1)',background:type==='income'?'rgba(34,197,94,0.3)':'rgba(255,255,255,0.05)',color:'white',fontWeight:'bold',boxShadow:type==='income'?'0 0 20px #22c55e':'none'}}>⬇️ রিসিভ</button>
+            <button onClick={()=>setType('expense')} style={{padding:'11px',borderRadius:'11px',border:'1px solid',borderColor:type==='expense'?'#ef4444':'rgba(255,255,255,0.1)',background:type==='expense'?'rgba(239,68,68,0.3)':'rgba(255,255,255,0.05)',color:'white',fontWeight:'bold',boxShadow:type==='expense'?'0 0 20px #ef4444':'none'}}>⬆️ পাঠান</button>
+          </div>
+          <button onClick={add} style={{width:'100%',padding:'13px',borderRadius:'12px',border:'none',background:'linear-gradient(90deg,#22d3ee,#a78bfa)',color:'black',fontWeight:'900',boxShadow:'0 0 30px rgba(34,211,238,0.7)'}}>Add করুন ✨</button>
+        </div>
       </div>
     </div>
   );
