@@ -1,82 +1,72 @@
 "use client";
 import { useState, useEffect } from "react";
-
-type Tx = { id: number; name: string; amount: number; method: string; type: 'income' | 'expense'; date: string; };
+type Tx = { id: number; name: string; amount: number; method: string; type: 'income'|'expense'; date: string; };
 
 export default function Page() {
   const [balance, setBalance] = useState(0);
-  const [customers, setCustomers] = useState<Tx[]>([]);
-  const [name, setName] = useState("");
-  const [amount, setAmount] = useState("");
-  const [method, setMethod] = useState("bkash");
-  const [txType, setTxType] = useState<'income'|'expense'>('income');
+  const [list, setList] = useState<Tx[]>([]);
+  const [name, setName] = useState(""); const [amount, setAmount] = useState("");
+  const [method, setMethod] = useState("bkash"); const [type, setType] = useState<'income'|'expense'>('income');
+  
+  useEffect(()=>{ const b=localStorage.getItem("mirgonj_balance"); const l=localStorage.getItem("mirgonj_customers"); if(b)setBalance(Number(b)); if(l)setList(JSON.parse(l)); },[]);
+  useEffect(()=>{ localStorage.setItem("mirgonj_balance",String(balance)); localStorage.setItem("mirgonj_customers",JSON.stringify(list)); },[balance,list]);
 
-  useEffect(() => {
-    const s = localStorage.getItem("mirgonj_balance");
-    const c = localStorage.getItem("mirgonj_customers");
-    if (s) setBalance(Number(s));
-    if (c) setCustomers(JSON.parse(c));
-  }, []);
-  useEffect(() => {
-    localStorage.setItem("mirgonj_balance", String(balance));
-    localStorage.setItem("mirgonj_customers", JSON.stringify(customers));
-  }, [balance, customers]);
-
-  const add = () => {
-    if (!name || !amount) return alert("নাম ও টাকা লিখুন");
-    const amt = Number(amount);
-    const newTx: Tx = { id: Date.now(), name, amount: amt, method, type: txType, date: new Date().toLocaleString('bn-BD') };
-    setCustomers([newTx, ...customers]);
-    if (txType === 'income') setBalance(balance + amt); else setBalance(balance - amt);
-    setName(""); setAmount("");
+  const add=()=>{
+    if(!name||!amount)return alert("নাম ও টাকা দিন"); const a=Number(amount);
+    const tx:Tx={id:Date.now(),name,amount:a,method,type,date:new Date().toLocaleTimeString('bn-BD',{hour:'2-digit',minute:'2-digit'})};
+    setList([tx,...list]); setBalance(type==='income'?balance+a:balance-a); setName(""); setAmount("");
   };
-  const del = (id: number, amt: number, type: string) => {
-    if (!confirm("Delete?")) return;
-    setCustomers(customers.filter(c => c.id !== id));
-    if (type === 'income') setBalance(balance - amt); else setBalance(balance + amt);
-  }
+  const del=(id:number,a:number,t:string)=>{ if(!confirm("Delete?"))return; setList(list.filter(x=>x.id!==id)); setBalance(t==='income'?balance-a:balance+a); };
 
-  const sBox = (t:any) => ({ background: t, borderRadius: '16px', padding: '20px', color: 'white', textAlign: 'center' as const, marginBottom: '15px' });
+  const sum=(m:string)=> list.filter(x=>x.method===m&&x.type==='income').reduce((s,x)=>s+x.amount,0)-list.filter(x=>x.method===m&&x.type==='expense').reduce((s,x)=>s+x.amount,0);
 
   return (
-    <div style={{ minHeight: '100vh', background: '#0f0f0f', color: 'white', padding: '15px', fontFamily: 'sans-serif' }}>
-      <div style={{ maxWidth: '400px', margin: '0 auto' }}>
-        <h1 style={{ textAlign: 'center', fontSize: '24px', fontWeight: 'bold', margin: '10px 0' }}>💰 মিরগঞ্জ Wallet PRO</h1>
+    <div style={{minHeight:'100vh',background:'#050507',color:'white',padding:'16px',fontFamily:'system-ui'}}>
+      <div style={{maxWidth:'420px',margin:'0 auto'}}>
+        
+        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'20px'}}>
+          <div><h1 style={{fontSize:'26px',fontWeight:'900',margin:0}}>মিরগঞ্জ <span style={{background:'#7c3aed',padding:'2px 8px',borderRadius:'8px',fontSize:'14px',verticalAlign:'middle'}}>PRO</span></h1><p style={{margin:0,opacity:0.6,fontSize:'14px'}}>Wallet PRO</p></div>
+          <div style={{width:'40px',height:'40px',borderRadius:'50%',background:'#222',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'20px'}}>👤</div>
+        </div>
 
-        <div style={{ background: 'linear-gradient(135deg,#9333ea,#3b82f6)', borderRadius: '20px', padding: '20px', textAlign: 'center', marginBottom: '15px' }}>
-          <p style={{ opacity: 0.8, fontSize: '14px' }}>মোট ব্যালেন্স</p>
-          <h2 style={{ fontSize: '36px', fontWeight: 'bold', margin: '5px 0' }}>৳ {balance}</h2>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px', marginTop: '15px' }}>
-            <div style={{ background: 'rgba(255,255,255,0.2)', borderRadius: '10px', padding: '8px' }}><div>bKash</div><b>৳ {customers.filter(c=>c.method==='bkash'&&c.type==='income').reduce((a,b)=>a+b.amount,0)-customers.filter(c=>c.method==='bkash'&&c.type==='expense').reduce((a,b)=>a+b.amount,0)}</b></div>
-            <div style={{ background: 'rgba(255,255,255,0.2)', borderRadius: '10px', padding: '8px' }}><div>Nagad</div><b>৳ {customers.filter(c=>c.method==='nagad'&&c.type==='income').reduce((a,b)=>a+b.amount,0)-customers.filter(c=>c.method==='nagad'&&c.type==='expense').reduce((a,b)=>a+b.amount,0)}</b></div>
-            <div style={{ background: 'rgba(255,255,255,0.2)', borderRadius: '10px', padding: '8px' }}><div>Cash</div><b>৳ {customers.filter(c=>c.method==='cash'&&c.type==='income').reduce((a,b)=>a+b.amount,0)-customers.filter(c=>c.method==='cash'&&c.type==='expense').reduce((a,b)=>a+b.amount,0)}</b></div>
+        <div style={{background:'linear-gradient(135deg,#6d28d9 0%,#4f46e5 50%,#3b82f6 100%)',borderRadius:'28px',padding:'22px',position:'relative',overflow:'hidden',boxShadow:'0 20px 40px rgba(124,58,237,0.3)',marginBottom:'18px'}}>
+          <div style={{position:'absolute',top:'-40px',right:'-40px',width:'150px',height:'150px',background:'rgba(255,255,255,0.15)',borderRadius:'50%',filter:'blur(20px)'}}></div>
+          <p style={{opacity:0.9,fontSize:'15px',margin:0}}>মোট ব্যালেন্স 👁️</p>
+          <h2 style={{fontSize:'42px',fontWeight:'900',margin:'8px 0',letterSpacing:'-1px'}}>৳ {balance.toLocaleString('en-IN')}</h2>
+          <p style={{fontSize:'13px',color:'#86efac',margin:'0 0 18px 0'}}>+ ৳ {Math.floor(balance*0.05)} আজ</p>
+          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:'0',borderTop:'1px solid rgba(255,255,255,0.15)',paddingTop:'16px'}}>
+            <div style={{textAlign:'center',borderRight:'1px solid rgba(255,255,255,0.15)'}}><div style={{fontSize:'16px'}}>🅺 bKash</div><b style={{fontSize:'15px'}}>৳ {sum('bkash')}</b></div>
+            <div style={{textAlign:'center',borderRight:'1px solid rgba(255,255,255,0.15)'}}><div style={{fontSize:'16px'}}>🔶 Nagad</div><b style={{fontSize:'15px'}}>৳ {sum('nagad')}</b></div>
+            <div style={{textAlign:'center'}}><div style={{fontSize:'16px'}}>💵 Cash</div><b style={{fontSize:'15px'}}>৳ {sum('cash')}</b></div>
           </div>
         </div>
 
-        <div style={{ background: '#1e1e1e', borderRadius: '16px', padding: '15px', marginBottom: '15px', border: '1px solid #333' }}>
-          <input value={name} onChange={e=>setName(e.target.value)} placeholder="Customer নাম" style={{ width: '100%', padding: '12px', borderRadius: '10px', background: '#2a2a2a', border: '1px solid #444', color: 'white', marginBottom: '10px', boxSizing: 'border-box' }} />
-          <input value={amount} onChange={e=>setAmount(e.target.value)} type="number" placeholder="টাকার পরিমান" style={{ width: '100%', padding: '12px', borderRadius: '10px', background: '#2a2a2a', border: '1px solid #444', color: 'white', marginBottom: '10px', boxSizing: 'border-box' }} />
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '10px' }}>
-            <button onClick={()=>setTxType('income')} style={{ padding: '12px', borderRadius: '10px', border: 'none', fontWeight: 'bold', background: txType==='income'?'#16a34a':'#2a2a2a', color: 'white' }}>➕ জমা</button>
-            <button onClick={()=>setTxType('expense')} style={{ padding: '12px', borderRadius: '10px', border: 'none', fontWeight: 'bold', background: txType==='expense'?'#dc2626':'#2a2a2a', color: 'white' }}>➖ খরচ</button>
+        <div style={{background:'#15151a',borderRadius:'22px',padding:'16px',border:'1px solid #23232a',marginBottom:'20px'}}>
+          <input value={name} onChange={e=>setName(e.target.value)} placeholder="কাস্টমার নাম বা প্রাপকের নম্বর..." style={{width:'100%',padding:'14px',borderRadius:'14px',background:'#1e1e25',border:'1px solid #2a2a35',color:'white',marginBottom:'10px',boxSizing:'border-box',outline:'none'}}/>
+          <input value={amount} onChange={e=>setAmount(e.target.value)} type="number" placeholder="৳ পরিমাণ লিখুন" style={{width:'100%',padding:'14px',borderRadius:'14px',background:'#1e1e25',border:'1px solid #2a2a35',color:'white',marginBottom:'12px',boxSizing:'border-box',outline:'none'}}/>
+          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'10px',marginBottom:'10px'}}>
+            <button onClick={()=>setType('income')} style={{padding:'13px',borderRadius:'14px',border:'none',fontWeight:'bold',background:type==='income'?'#16a34a':'#1e1e25',color:'white'}}>⬇️ রিসিভ</button>
+            <button onClick={()=>setType('expense')} style={{padding:'13px',borderRadius:'14px',border:'none',fontWeight:'bold',background:type==='expense'?'#dc2626':'#1e1e25',color:'white'}}>⬆️ পাঠান</button>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px', marginBottom: '10px' }}>
+          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:'8px',marginBottom:'12px'}}>
             {['bkash','nagad','cash'].map(m=>(
-              <button key={m} onClick={()=>setMethod(m)} style={{ padding: '10px', borderRadius: '10px', border: '1px solid #444', background: method===m?'#9333ea':'#2a2a2a', color: 'white', textTransform: 'capitalize' }}>{m}</button>
+              <button key={m} onClick={()=>setMethod(m)} style={{padding:'11px',borderRadius:'12px',border:'1px solid',borderColor:method===m?'#7c3aed':'#2a2a35',background:method===m?'#7c3aed':'#1e1e25',color:'white',fontWeight:'600',textTransform:'capitalize'}}>{m}</button>
             ))}
           </div>
-          <button onClick={add} style={{ width: '100%', padding: '13px', borderRadius: '10px', border: 'none', background: 'white', color: 'black', fontWeight: 'bold', fontSize: '16px' }}>Add করুন</button>
+          <button onClick={add} style={{width:'100%',padding:'14px',borderRadius:'14px',border:'none',background:'white',color:'black',fontWeight:'900',fontSize:'16px'}}>Add করুন ✨</button>
         </div>
 
-        <div>
-          {customers.map(c=>(
-            <div key={c.id} style={{ background: '#1e1e1e', padding: '12px', borderRadius: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', border: '1px solid #333' }}>
-              <div><div style={{ fontWeight: 'bold' }}>{c.name} <span style={{ fontSize: '10px', background: '#333', padding: '3px 8px', borderRadius: '20px', marginLeft: '5px' }}>{c.method}</span></div><div style={{ fontSize: '11px', opacity: 0.6 }}>{c.date}</div></div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}><b style={{ color: c.type==='income'?'#4ade80':'#f87171' }}>{c.type==='income'?'+':'-'} ৳{c.amount}</b><button onClick={()=>del(c.id,c.amount,c.type)} style={{ background: 'none', border: 'none', color: '#ef4444', fontSize: '18px' }}>✕</button></div>
+        <h3 style={{fontSize:'18px',fontWeight:'800',marginBottom:'10px'}}>সাম্প্রতিক লেনদেন</h3>
+        {list.map(c=>(
+          <div key={c.id} style={{background:'#15151a',padding:'14px',borderRadius:'16px',display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'10px',border:'1px solid #23232a'}}>
+            <div style={{display:'flex',gap:'10px',alignItems:'center'}}>
+              <div style={{width:'42px',height:'42px',borderRadius:'12px',background:c.method==='bkash'?'#e11d48':c.method==='nagad'?'#f97316':'#334155',display:'flex',alignItems:'center',justifyContent:'center',fontWeight:'bold'}}>{c.method[0].toUpperCase()}</div>
+              <div><div style={{fontWeight:'bold'}}>{c.name}</div><div style={{fontSize:'12px',opacity:0.5}}>আজ, {c.date} • {c.method}</div></div>
             </div>
-          ))}
-          {customers.length===0 && <p style={{ textAlign: 'center', opacity: 0.5, padding: '30px' }}>কোন হিসাব নেই</p>}
-        </div>
+            <div style={{textAlign:'right'}}><b style={{color:c.type==='income'?'#4ade80':'#fb7185'}}>{c.type==='income'?'+':'-'} ৳{c.amount}</b><div><button onClick={()=>del(c.id,c.amount,c.type)} style={{background:'none',border:'none',color:'#666',fontSize:'12px'}}>Delete</button></div></div>
+          </div>
+        ))}
+        {list.length===0&&<p style={{textAlign:'center',opacity:0.4,padding:'30px'}}>কোন হিসাব নেই</p>}
       </div>
     </div>
   );
