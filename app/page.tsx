@@ -1,39 +1,60 @@
 "use client";
+import { useState } from "react";
 
-const img = {
-  bkash: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='white'/><text x='50' y='62' text-anchor='middle' font-family='Arial Black' font-size='30'><tspan fill='%23E2136E'>b</tspan><tspan fill='black'>Kash</tspan></text></svg>",
-  nagad: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='white'/><circle cx='50' cy='38' r='18' fill='%23FF6A00'/><text x='50' y='44' text-anchor='middle' fill='white' font-weight='900' font-size='20'>N</text><text x='50' y='78' text-anchor='middle' fill='%23FF6A00' font-weight='900' font-size='18'>নগদ</text></svg>",
-  rocket: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='white'/><text x='50' y='40' text-anchor='middle' font-size='28'>🚀</text><text x='50' y='75' text-anchor='middle' fill='%238A2BE2' font-weight='900' font-size='16'>রকেট</text></svg>",
-  upay: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='white'/><text x='50' y='45' text-anchor='middle' fill='%2300B4D8' font-weight='900' font-size='22'>Upay</text><text x='50' y='68' text-anchor='middle' font-weight='700' font-size='16'>উপায়</text></svg>",
-  usdt: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='white'/><path d='M50 15 L85 32 L85 68 L50 85 L15 68 L15 32 Z' fill='%2326A17B'/><text x='50' y='65' text-anchor='middle' fill='white' font-weight='900' font-size='36'>T</text></svg>",
-  mcash: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='white'/><text x='50' y='68' text-anchor='middle' fill='%23E2136E' font-weight='900' font-size='18'>এম ক্যাশ</text><text x='50' y='38' text-anchor='middle' fill='%23FF6A00' font-weight='900' font-size='28'>M</text></svg>",
-  dbbl: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='white'/><g transform='rotate(-15 50 50)'><rect x='15' y='42' width='70' height='10' rx='5' fill='%230068B5'/><rect x='15' y='56' width='70' height='10' rx='5' fill='%23E2136E'/><rect x='15' y='70' width='70' height='10' rx='5' fill='%2300A651'/></g></svg>"
-};
+const btn3D = (color: string) => ({
+  background: `linear-gradient(180deg, ${color} 0%, ${color}dd 100%)`,
+  borderRadius: "20px",
+  padding: "12px 8px 8px",
+  textAlign: "center" as const,
+  position: "relative" as const,
+  boxShadow: `0 8px 0 ${color}99, 0 12px 20px rgba(0,0,0,0.4), inset 0 2px 0 rgba(255,255,255,0.3)`,
+  transform: "translateY(0px)",
+  transition: "all 0.15s ease",
+  cursor: "pointer",
+  userSelect: "none" as const,
+});
 
-export default function Page() {
-  return (
-    <div style={{minHeight:"100vh",background:"#0f0f2a",paddingBottom:"40px"}}>
-      <div style={{maxWidth:"400px",margin:"0 auto",minHeight:"100vh",background:"linear-gradient(180deg,#6b6bb8 0%,#2a2a5a 40%,#121230 100%)",padding:"16px"}}>
-        <h1 style={{color:"#fff",fontSize:"22px",fontWeight:"900",margin:0}}>শুভ সন্ধ্যা রাহিম</h1>
-        <p style={{color:"#a8a8d0",fontSize:"12px",marginTop:"4px"}}>আপনার ডিজিটাল ওয়ালেট</p>
-        <div style={{background:"rgba(255,255,255,0.12)",border:"1px solid rgba(255,255,255,0.2)",borderRadius:"20px",padding:"16px",marginTop:"16px"}}>
-          <div style={{color:"#fff",fontSize:"34px",fontWeight:"900"}}>৳24,580.50</div>
-          <div style={{color:"#7CFFB2",fontSize:"12px"}}>↑ +2,140.00 এই মাসে</div>
-          <div style={{display:"flex",justifyContent:"space-between",background:"rgba(0,0,0,0.15)",borderRadius:"12px",padding:"10px",marginTop:"12px",color:"#fff"}}>
-            <div><div style={{fontSize:"11px",color:"#9a9ac0"}}>কার্ড ••••</div><b>8847</b></div>
-            <div style={{borderLeft:"1px solid rgba(255,255,255,0.1)",paddingLeft:"16px"}}><div style={{fontSize:"11px",color:"#9a9ac0"}}>মেয়াদ</div><b>12/27</b></div>
-            <div style={{fontWeight:"900",fontStyle:"italic"}}>VISA</div>
-          </div>
+export default function Page(){
+  const [pressed, setPressed] = useState<string | null>(null);
+
+  const LogoCard = ({id, name, color, children}: any) => (
+    <div
+      onMouseDown={()=>setPressed(id)}
+      onMouseUp={()=>setPressed(null)}
+      onTouchStart={()=>setPressed(id)}
+      onTouchEnd={()=>setPressed(null)}
+      style={{
+        ...btn3D(color),
+        transform: pressed===id ? "translateY(6px)" : "translateY(0px)",
+        boxShadow: pressed===id 
+          ? `0 2px 0 ${color}99, 0 4px 10px rgba(0,0,0,0.3)` 
+          : `0 8px 0 ${color}99, 0 12px 20px rgba(0,0,0,0.4), inset 0 2px 0 rgba(255,255,255,0.3)`,
+      }}
+    >
+      <div style={{background:"#fff",width:"56px",height:"56px",borderRadius:"14px",margin:"0 auto",display:"flex",alignItems:"center",justifyContent:"center",boxShadow:"inset 0 2px 6px rgba(0,0,0,0.15)"}}>
+        {children}
+      </div>
+      <div style={{color:"#fff",fontSize:"12px",fontWeight:"800",marginTop:"8px",textShadow:"0 1px 2px rgba(0,0,0,0.3)"}}>{name}</div>
+    </div>
+  );
+
+  return(
+    <div style={{minHeight:"100vh",background:"#0f0f2a",padding:"16px"}}>
+      <div style={{maxWidth:"400px",margin:"0 auto"}}>
+        <h1 style={{color:"#fff",fontSize:"22px",fontWeight:"900"}}>শুভ সন্ধ্যা রাহিম</h1>
+        <p style={{color:"#a8a8d0",fontSize:"12px"}}>আপনার ডিজিটাল ওয়ালেট</p>
+        <div style={{background:"rgba(255,255,255,0.12)",borderRadius:"20px",padding:"16px",marginTop:"16px",border:"1px solid rgba(255,255,255,0.2)"}}>
+          <div style={{color:"#fff",fontSize:"32px",fontWeight:"900"}}>৳24,580.50</div>
         </div>
-        <div style={{color:"#fff",fontSize:"14px",fontWeight:"700",margin:"18px 0 10px"}}>মোবাইল ব্যাংকিং</div>
-        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr 1fr",gap:"10px"}}>
-          <div style={{background:"#E2136E",borderRadius:"16px",padding:"10px",textAlign:"center"}}><img src={img.bkash} width={52} height={52} style={{borderRadius:"12px"}} alt="bKash" /><div style={{color:"#fff",fontSize:"11px",marginTop:"6px",fontWeight:"700"}}>bKash</div></div>
-          <div style={{background:"#FF6A00",borderRadius:"16px",padding:"10px",textAlign:"center"}}><img src={img.nagad} width={52} height={52} style={{borderRadius:"12px"}} alt="Nagad" /><div style={{color:"#fff",fontSize:"11px",marginTop:"6px",fontWeight:"700"}}>নগদ</div></div>
-          <div style={{background:"#8A2BE2",borderRadius:"16px",padding:"10px",textAlign:"center"}}><img src={img.rocket} width={52} height={52} style={{borderRadius:"12px"}} alt="Rocket" /><div style={{color:"#fff",fontSize:"11px",marginTop:"6px",fontWeight:"700"}}>রকেট</div></div>
-          <div style={{background:"#00B4D8",borderRadius:"16px",padding:"10px",textAlign:"center"}}><img src={img.upay} width={52} height={52} style={{borderRadius:"12px"}} alt="Upay" /><div style={{color:"#fff",fontSize:"11px",marginTop:"6px",fontWeight:"700"}}>উপায়</div></div>
-          <div style={{background:"#4a5a6a",borderRadius:"16px",padding:"10px",textAlign:"center"}}><img src={img.usdt} width={52} height={52} style={{borderRadius:"12px"}} alt="USDT" /><div style={{color:"#fff",fontSize:"11px",marginTop:"6px"}}>USDT</div></div>
-          <div style={{background:"#FF6A00",borderRadius:"16px",padding:"10px",textAlign:"center"}}><img src={img.mcash} width={52} height={52} style={{borderRadius:"12px"}} alt="mCash" /><div style={{color:"#fff",fontSize:"11px",marginTop:"6px"}}>mCash</div></div>
-          <div style={{background:"#4a5a6a",borderRadius:"16px",padding:"10px",textAlign:"center"}}><img src={img.dbbl} width={52} height={52} style={{borderRadius:"12px"}} alt="DBBL" /><div style={{color:"#fff",fontSize:"10px",marginTop:"6px"}}>DBBL</div></div>
+        <div style={{color:"#fff",fontWeight:"700",margin:"18px 0 10px"}}>মোবাইল ব্যাংকিং</div>
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:"16px"}}>
+          <LogoCard id="bk" name="bKash" color="#E2136E"><span style={{fontWeight:"900"}}><span style={{color:"#E2136E"}}>b</span>Kash</span></LogoCard>
+          <LogoCard id="ng" name="নগদ" color="#FF6A00"><div style={{textAlign:"center"}}><div style={{background:"#FF6A00",color:"#fff",width:"22px",height:"22px",borderRadius:"50%",margin:"0 auto",fontWeight:"900",fontSize:"12px"}}>N</div><div style={{fontSize:"11px",color:"#FF6A00",fontWeight:"900"}}>নগদ</div></div></LogoCard>
+          <LogoCard id="rk" name="রকেট" color="#8A2BE2"><div>🚀<div style={{fontSize:"9px",fontWeight:"900",color:"#8A2BE2"}}>রকেট</div></div></LogoCard>
+          <LogoCard id="up" name="উপায়" color="#00B4D8"><span style={{fontWeight:"900",color:"#00B4D8"}}>Upay</span></LogoCard>
+          <LogoCard id="us" name="USDT" color="#26A17B"><div style={{width:"28px",height:"28px",background:"#26A17B",borderRadius:"6px",color:"#fff",display:"flex",alignItems:"center",justifyContent:"center",fontWeight:"900"}}>T</div></LogoCard>
+          <LogoCard id="mc" name="mCash" color="#FF6A00"><span style={{fontWeight:"900",color:"#E2136E"}}>mCash</span></LogoCard>
+          <LogoCard id="db" name="DBBL" color="#4a5a6a"><div style={{fontWeight:"900",color:"#4a5a6a"}}>DBBL</div></LogoCard>
         </div>
       </div>
     </div>
